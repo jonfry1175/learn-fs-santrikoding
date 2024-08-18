@@ -1,12 +1,100 @@
 <script setup>
+//import reactive and ref from vue
+import { reactive, ref } from "vue";
 
+//import useRouter from vue router
+import { useRouter } from "vue-router";
+
+//inisialisasi vue router on Composition API
+const router = useRouter();
+
+//import services api
+import { axiosInstance as api } from "../../utils/axios";
+//state user
+const user = reactive({
+  name: "",
+  email: "",
+  password: "",
+  password_confirmation: "",
+});
+
+//state validation
+const validation = ref([]);
+
+const register = async () => {
+    try {
+        const response = await api.post('/auth/register', user)
+        if(response.status === 201) {
+            router.push({ name: 'login' })
+        }
+    } catch (error) {
+        console.log(error.response.data)
+        validation.value = error.response.data
+    }
+}
 </script>
 
 <template>
-    <div class="p-5 mb-4 bg-light rounded-3 shadow-sm">
-        <div class="container-fluid py-5">
-            <h1 class="display-5 fw-bold">HALAMAN REGISTER</h1>
-            <p class="col-md-12 fs-4">Belajar Full Stack JavaScript Developer dengan Express dan Vue 3 di SantriKoding.com</p>
+  <div class="row justify-content-center">
+    <div class="row justify-content-center">
+      <div class="col-md-5">
+        <div class="card border-0 rounded shadow-sm">
+          <div class="card-body">
+            <h4>REGISTER</h4>
+            <hr />
+            <div v-if="validation" class="mt-2 alert alert-danger">
+              <ul class="mt-0 mb-0">
+                <li v-for="(error, index) in validation" :key="index">
+                  {{ `${error.path} : ${error.msg}` }}
+                </li>
+              </ul>
+            </div>
+            <form @submit.prevent="register">
+              <div class="row">
+                <div class="col-md-12 mb-3">
+                  <div class="form-group">
+                    <label class="mb-1 fw-bold">Full Name</label>
+                    <input
+                      type="text"
+                      v-model="user.name"
+                      class="form-control"
+                      placeholder="Full Name"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <div class="form-group">
+                    <label class="mb-1 fw-bold">Email address</label>
+                    <input
+                      type="email"
+                      v-model="user.email"
+                      class="form-control"
+                      placeholder="Email Address"
+                    />
+                  </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <div class="form-group">
+                    <label class="mb-1 fw-bold">Password</label>
+                    <input
+                      type="password"
+                      v-model="user.password"
+                      class="form-control"
+                      placeholder="Password"
+                    />
+                  </div>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary w-100">
+                REGISTER
+              </button>
+            </form>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 </template>
