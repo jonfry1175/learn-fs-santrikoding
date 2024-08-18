@@ -50,7 +50,7 @@ const login = async (req, res) => {
 
         // generate token
         const token = jwt.sign({ id: emailFound.id, email: emailFound.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
-        res.status(200).json(token);
+        res.status(200).json({ token });
     } catch (error) {
         res.status(500).json(error.message);
     }

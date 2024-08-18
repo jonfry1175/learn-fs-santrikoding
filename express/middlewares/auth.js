@@ -1,17 +1,27 @@
-// Import express
-// const express = require('express');
-
-// Import jwt
 const jwt = require('jsonwebtoken');
 
 const verifyToken = (req, res, next) => {
     // Get token
-    const token = req.headers['authorization'];
-    if (!token) return res.status(401).json({ message: 'Unauthenticated.' });
+    const authHeader = req.headers['authorization'];
+    
+    // Cek apakah authorization header ada atau tidak
+    if (!authHeader) {
+        return res.status(401).json({ message: 'Authorization header missing' });
+    }
+
+    // Ambil token dan cek apakah menggunakan format "Bearer"
+    const token = authHeader.replace('Bearer ', '');
+
+    // Cek apakah token kosong atau tidak setelah diparsing
+    if (!token) {
+        return res.status(401).json({ message: 'Unauthenticated.' });
+    }
 
     // Verify token
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-        if (err) return res.status(401).json({ message: 'Invalid token' });
+        if (err) {
+            return res.status(401).json({ message: 'Invalid token' });
+        }
         req.userId = decoded.id;
         next();
     });

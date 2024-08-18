@@ -1,10 +1,9 @@
 const route = require('express').Router();
-const auth = require('../middlewares/auth');
-const authController = require('../controllers/AuthController');
 const authRoute = require('./authRoute');
-
+const userRoute = require('./userRoute');
 // route
 route.get('/', (req, res) => res.send('Hello World!'));
 
 route.use('/auth', authRoute);
+route.use('/users', userRoute);
 module.exports = route
