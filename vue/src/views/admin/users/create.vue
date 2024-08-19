@@ -1,26 +1,98 @@
 <script setup>
-
+import { ref, reactive } from "vue";
+import Cookies from "js-cookie";
+import { useRouter } from "vue-router";
+import { toast } from "vue-sonner";
+import { axiosInstance } from "../../../utils/axios";
 //import sidebar component
-import SidebarMenu from '../../../components/SidebarMenu.vue'
+import SidebarMenu from "../../../components/SidebarMenu.vue";
 
+const router = useRouter();
+const token = Cookies.get("token");
+
+const user = reactive({
+  name: "",
+  email: "",
+  password: "",
+});
+
+const validation = ref([]);
+
+const createUser = async () => {
+  try {
+    const response = await axiosInstance.post("/users", user, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.status === 201) {
+      console.log(response.data);
+      toast.success("User created successfully");
+      setTimeout(() => {
+        router.push({ name: "admin.users.index" });
+      }, 500);
+    }
+  } catch (error) {
+    toast.error(error.message);
+    validation.value = {errors: error?.response?.data};
+  }
+};
 </script>
 
 <template>
-    <div class="container mt-5 mb-5">
-        <div class="row">
-            <div class="col-md-3">
-                <SidebarMenu />
+  <div class="container mt-5 mb-5">
+    <div class="row">
+      <div class="col-md-3">
+        <SidebarMenu />
+      </div>
+      <div class="col-md-9">
+        <div class="card border-0 rounded shadow-sm">
+          <div class="card-header">ADD USER</div>
+          <div class="card-body">
+            <div v-if="validation.errors" class="mt-2 alert alert-danger">
+              <ul class="mt-0 mb-0">
+                <li v-for="(error, index) in validation.errors" :key="index">
+                  {{ `${error.path} : ${error.msg}` }}
+                </li>
+              </ul>
             </div>
-            <div class="col-md-9">
-                <div class="card border-0 rounded shadow-sm">
-                    <div class="card-header">
-                        DASHBOARD
-                    </div>
-                    <div class="card-body">
-                        HALAMAN USER CREATE
-                    </div>
-                </div>
-            </div>
+            <form @submit.prevent="createUser">
+              <div class="form-group mb-3">
+                <label class="mb-1 fw-bold">Full Name</label>
+                <input
+                  type="text"
+                  v-model="user.name"
+                  class="form-control"
+                  placeholder="Full Name"
+                />
+              </div>
+
+              <div class="form-group mb-3">
+                <label class="mb-1 fw-bold">Email address</label>
+                <input
+                  type="email"
+                  v-model="user.email"
+                  class="form-control"
+                  placeholder="Email Address"
+                />
+              </div>
+
+              <div class="form-group mb-3">
+                <label class="mb-1 fw-bold">Password</label>
+                <input
+                  type="password"
+                  v-model="user.password"
+                  class="form-control"
+                  placeholder="Password"
+                />
+              </div>
+
+              <button type="submit" class="btn btn-sm btn-primary">SAVE</button>
+            </form>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 </template>
