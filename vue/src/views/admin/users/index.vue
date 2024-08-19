@@ -25,6 +25,22 @@ const getUsers = async () => {
     }
 }
 
+const deleteUser = async (id) => {
+    try {
+        await axiosInstance.delete(`/users/${id}`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+        toast.success('User deleted successfully');
+        setTimeout(() => {
+        users.value = users.value.filter(user => user.id !== id)
+        }, 300)
+    } catch (error) {
+        toast.error(error.message);
+    }
+}
+
 onMounted(() => {
     getUsers()
 })
@@ -69,7 +85,7 @@ onMounted(() => {
                                     <td class="text-center">
                                         <router-link :to="{ name: 'admin.users.edit', params: { id: user.id } }"
                                             class="btn btn-sm btn-primary rounded-sm shadow border-0 me-2">EDIT</router-link>
-                                        <button class="btn btn-sm btn-danger rounded-sm shadow border-0">DELETE</button>
+                                        <button @click="deleteUser(user.id)" class="btn btn-sm btn-danger rounded-sm shadow border-0">DELETE</button>
                                     </td>
                                 </tr>
                             </tbody>
