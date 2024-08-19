@@ -14,6 +14,7 @@ import { axiosInstance as api } from '../../utils/axios'
 //import js-cookie
 import Cookies from 'js-cookie'
 import { jwtDecode } from 'jwt-decode';
+import { toast } from 'vue-sonner';
 
 //state user
 const user = reactive({
@@ -25,41 +26,12 @@ const user = reactive({
 const validation = ref([])
 const loginFailed = ref([])
 
-//method login
-// const login = async () => {
-
-//     //call api login
-//     await api.post('/api/login', {
-//         email: user.email,
-//         password: user.password
-//     })
-//     .then(response => {
-
-//         //set token and user on cookies
-//         Cookies.set('token', response.data.data.token)
-//         Cookies.set('user', JSON.stringify(response.data.data.user))
-
-//         // Verify the token is set before redirecting
-//         if (Cookies.get('token')) {
-//             //redirect to dashboard
-//             router.push({ name: 'dashboard' })
-//         } 
-        
-//     })
-//     .catch(error => {
-//         //assign validation value with error
-//         validation.value = error.response.data
-
-//         //assign loginFailed value with error
-//         loginFailed.value = error.response.data
-//     })
-
-// }
 
 const login = async () => {
     try {
         const response = await api.post('/auth/login', user)
         if(response.status === 200) {
+            toast.success("Login success");
             const { token } = response.data
             const user = jwtDecode(token)
             // const combined = { token, data: jwtDecode(token) }
@@ -67,10 +39,13 @@ const login = async () => {
             Cookies.set('user', JSON.stringify(user))
 
             if(Cookies.get('token')) {
+               setTimeout(() => {
                 router.push({ name: 'dashboard' })
+               }, 1000)
             }
         }
     } catch (error) {
+        toast.error("Login failed");
         console.log({message: error?.response.statusText})
         validation.value = error?.response?.data
         loginFailed.value = {message: error?.response.statusText}

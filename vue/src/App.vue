@@ -1,8 +1,10 @@
 <script setup>
+import { Toaster } from 'vue-sonner';
 
 </script>
 
 <template>
+  <Toaster position="bottom-right" richColors closeButton/>
   <div>
     <nav class="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
       <div class="container">

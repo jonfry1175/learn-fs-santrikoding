@@ -10,6 +10,7 @@ const router = useRouter();
 
 //import services api
 import { axiosInstance as api } from "../../utils/axios";
+import { toast } from "vue-sonner";
 //state user
 const user = reactive({
   name: "",
@@ -25,9 +26,13 @@ const register = async () => {
     try {
         const response = await api.post('/auth/register', user)
         if(response.status === 201) {
-            router.push({ name: 'login' })
+            toast.success("Register success");
+            setTimeout(() => {
+              router.push({ name: 'login' })
+            }, 1000)
         }
     } catch (error) {
+      toast.error("Register failed");
         console.log(error.response.data)
         validation.value = error.response.data
     }
